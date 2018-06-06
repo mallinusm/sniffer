@@ -1,10 +1,3 @@
-define sniffer
-from Sniffer.Application import Application
-
-Application().main()
-endef
-export sniffer
-
 .PHONY: help run install
 
 .DEFAULT_GOAL=help
@@ -14,7 +7,8 @@ help: ## Show help comments for the targets
 
 install: ## Install the application
 	sudo apt install python3-dev virtualenv
-	virtualenv -p python3 --no-site-packages --distribute .env && source .env/bin/activate && pip install -r requirements.txt
+	virtualenv -p python3 --no-site-packages --distribute .env && source .env/bin/activate
+	.env/bin/pip3 install -r requirements.txt
 
 run: ## Run the application
-	.env/bin/python3 -c "$$sniffer"
+	sudo .env/bin/python3 -m Sniffer.Application
