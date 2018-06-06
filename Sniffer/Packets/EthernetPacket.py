@@ -5,12 +5,12 @@ from Sniffer.Packets import Packet
 
 
 class EthernetPacket:
+    type = None
     packet = None
     payload = None
-    type = None
-    destination_address = None
-    source_address = None
     header_length = 14
+    source_address = None
+    destination_address = None
 
     def __init__(self, packet: Packet):
         self.packet = packet
@@ -43,6 +43,6 @@ class EthernetPacket:
         return self
 
     def to_string(self) -> str:
-        return 'Source address: {0}, Destination address: {1}, Type: {2}'.format(
-            self.get_source_address(), self.get_destination_address(), self.get_type()
+        return 'Class: {0}, Source address: {1}, Destination address: {2}, Type: {3}'.format(
+            self.__class__.__name__, self.get_source_address(), self.get_destination_address(), self.get_type()
         )

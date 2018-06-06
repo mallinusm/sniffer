@@ -9,3 +9,6 @@ class Packet:
 
     def get_payload_length(self) -> int:
         return len(self.payload)
+
+    def to_string(self) -> str:
+        return 'Length: {0}'.format(self.get_payload_length())

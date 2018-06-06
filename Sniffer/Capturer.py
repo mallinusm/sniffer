@@ -3,6 +3,7 @@ import pcapy
 
 from Sniffer.Output.Message import Message
 from Sniffer.Packets.EthernetPacket import EthernetPacket
+from Sniffer.Packets.IPPacket import IPPacket
 from Sniffer.Packets.Packet import Packet
 
 
@@ -28,13 +29,13 @@ class Capturer:
     def parse_packet(self, packet: bytes):
         packet = Packet(packet)
 
-        Message.info('Date: {0}, Class {1}, Payload Length: {2}'.format(
-            datetime.datetime.now(), type(packet), packet.get_payload_length())
-        )
+        Message.info(packet.to_string())
 
         ethernet_packet = EthernetPacket(packet).decode()
 
         Message.info(ethernet_packet.to_string())
 
         if ethernet_packet.get_type() == 8:
-            Message.info('It is IP!')
+            ip_packet = IPPacket(ethernet_packet).decode()
+
+            Message.info(ip_packet.to_string())
