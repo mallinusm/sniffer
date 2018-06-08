@@ -37,6 +37,3 @@ class EthernetPacket(BasePacket):
         self.bag.set_attribute('type', socket.ntohs(header[2]))
 
         return self
-
-    def to_string(self) -> str:
-        return 'Class: {0}: {1}'.format(self.__class__.__name__, self.bag.to_string())

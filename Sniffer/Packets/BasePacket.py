@@ -1,3 +1,5 @@
+import inspect
+
 from Sniffer.Bag import Bag
 
 
@@ -17,5 +19,9 @@ class BasePacket:
     def get_bag(self) -> Bag:
         return self.bag
 
-    def get_payload(self):
+    def get_payload(self) -> bytes:
         return self.packet.get_payload()[self.offset:]
+
+    def to_string(self) -> str:
+        # Dirty... There seems to be no other way around.
+        return 'Class: {0}: {1}'.format(inspect.stack()[0][0].f_locals['self'].__class__.__name__, self.bag.to_string())

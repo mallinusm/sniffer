@@ -84,6 +84,3 @@ class IPPacket(BasePacket):
             self.offset = calculated_offset
 
         return self
-
-    def to_string(self) -> str:
-        return 'Class: {0}: {1}'.format(self.__class__.__name__, self.bag.to_string())
