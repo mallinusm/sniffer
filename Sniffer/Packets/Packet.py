@@ -11,4 +11,4 @@ class Packet:
         return len(self.payload)
 
     def to_string(self) -> str:
-        return 'Length: {0}'.format(self.get_payload_length())
+        return 'Class: {0}, Length: {1}'.format(self.__class__.__name__, self.get_payload_length())
