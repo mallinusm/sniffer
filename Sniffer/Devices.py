@@ -4,22 +4,22 @@ from Sniffer.Output.Message import Message
 
 
 class Devices:
-    message = None
-
     def __init__(self) -> None:
-        self.message = Message()
+        pass
 
-    def list(self) -> None:
-        self.message.info(pcapy.findalldevs())
+    @staticmethod
+    def list() -> None:
+        Message.info(pcapy.findalldevs())
 
-    def choose(self) -> str:
+    @staticmethod
+    def choose() -> str:
         devices = pcapy.findalldevs()
 
         for i, device in enumerate(devices):
-            self.message.info('{0}: {1}'.format(i, device))
+            Message.info('{0}: {1}'.format(i, device))
 
-        device = devices[int(self.message.input('<Choose device>: '))]
+        device = devices[int(Message.input('<Choose device>: '))]
 
-        self.message.info('Chosen device: {0}'.format(device))
+        Message.info('Chosen device: {0}'.format(device))
 
         return device

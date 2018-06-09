@@ -74,11 +74,13 @@ class IPPacket(BasePacket):
         self.bag.set_attribute('source_address', socket.inet_ntoa(ip_header[8]))
         self.bag.set_attribute('destination_address', socket.inet_ntoa(ip_header[9]))
 
-        # Since an IPv4 header may contain a variable number of options, the IHL (Internet Header Length) field
-        # specifies the size of the header (this also coincides with the offset to the data). The minimum value for this
-        # field is 5, which indicates a length of 5 * 32 bits = 160 bits = 20 bytes. As a 4-bit field, the maximum value
-        # is 15 words (15 * 32 bits, or 480 bits = 60 bytes).
-        # By default, we expect the header length to be 20 bytes. If that is not the case, we set the calculated offset.
+        """
+        Since an IPv4 header may contain a variable number of options, the IHL (Internet Header Length) field
+        specifies the size of the header (this also coincides with the offset to the data). The minimum value for this
+        field is 5, which indicates a length of 5 * 32 bits = 160 bits = 20 bytes. As a 4-bit field, the maximum value
+        is 15 words (15 * 32 bits, or 480 bits = 60 bytes).
+        By default, we expect the header length to be 20 bytes. If that is not the case, we set the calculated offset.
+        """
         calculated_offset = self.get_ihl() * 4
         if calculated_offset is not self.header_length:
             self.offset = calculated_offset
