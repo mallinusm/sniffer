@@ -28,11 +28,10 @@ class Capturer:
             while True:
                 (header, packet) = capture.next()
 
-                """
-                Message.info('Class: {0}, Time: {1}'.format(
-                    header.__class__.__name__, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
-                )
-                """
+                if self.verbose:
+                    Message.info('Class: {0}, Time: {1}'.format(
+                        header.__class__.__name__, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
+                    )
 
                 self.parse_packet(packet)
 

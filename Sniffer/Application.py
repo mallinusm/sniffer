@@ -26,10 +26,11 @@ class Application:
             'devices': self.devices,
             'target': self.set_target,
             'device': self.set_device,
-            'verbose': self.toggle_verbose,
-            'targets': self.list_targets
+            'targets': self.list_targets,
+            'verbose': self.toggle_verbose
         }
         self.aliases = {
+            'c': 'clear',
             's': 'start',
             't': 'target',
             'd': 'devices',
@@ -46,11 +47,18 @@ class Application:
         while value is None or value is "":
             value = Message.input('<Choose {0}>: '.format(target().get_name()))
 
-        self.targets.append(target(value))
+        target = target(value)
+
+        self.targets.append(target)
+
+        Message.info('Target {0} ({1}) was added.'.format(target.get_name(), target.get_value()))
 
     def list_targets(self) -> None:
-        for target in self.targets:
-            Message.info('{0} with value {1}'.format(target.get_name(), target.get_value()))
+        if len(self.targets) < 1:
+            Message.info('No targets specified.')
+        else:
+            for target in self.targets:
+                Message.info('{0} with value {1}'.format(target.get_name(), target.get_value()))
 
     def quit(self) -> None:
         self.running = False
@@ -70,12 +78,26 @@ class Application:
         Message.info('Verbose is now {0}'.format('on' if self.verbose else 'off'))
 
     def start(self) -> None:
+        if len(self.targets) < 1:
+            self.set_target()
+
         if self.device is None:
             self.set_device()
 
         Capturer(self.verbose).capture(self.device)
 
+    def show_welcome(self) -> None:
+        delimiter = '{0}'.format('#' * 30)
+
+        Message.info(delimiter)
+
+        Message.info('#{0}#'.format('S N I F F E R'.center(28, ' ')))
+
+        Message.info(delimiter)
+
     def main(self) -> None:
+        self.show_welcome()
+
         try:
             while self.running:
                 command = Message.input()

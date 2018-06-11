@@ -16,7 +16,7 @@ class EthernetPacket(BasePacket):
         }, packet, self.header_length)
 
     @staticmethod
-    def ethernet_address(address: str):
+    def ethernet_address(address: str) -> str:
         return "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x" % (ord(address[0]), ord(address[1]), ord(address[2]),
                                                   ord(address[3]), ord(address[4]), ord(address[5]))
 

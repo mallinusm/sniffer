@@ -9,7 +9,7 @@ class Devices:
 
     @staticmethod
     def list() -> None:
-        Message.info(pcapy.findalldevs())
+        [Message.info(device) for device in pcapy.findalldevs()]
 
     @staticmethod
     def choose() -> str:
