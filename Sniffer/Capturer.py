@@ -1,8 +1,10 @@
 import datetime
 import pcapy
+from typing import Union
 
 from Sniffer.Identifier import Identifier
 from Sniffer.Output.Message import Message
+from Sniffer.Packets.BasePacket import BasePacket
 from Sniffer.Packets.EthernetPacket import EthernetPacket
 from Sniffer.Packets.IPPacket import IPPacket
 from Sniffer.Packets.Packet import Packet
@@ -33,34 +35,30 @@ class Capturer:
                         header.__class__.__name__, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
                     )
 
-                self.parse_packet(packet)
+                self.recursive_parse_packet(packet)
 
-                # break
+                # Remove.
+                break
         except (KeyboardInterrupt, SystemExit):
             pass
 
-    def parse_packet(self, packet: bytes):
-        packet = Packet(packet)
-
-        if self.verbose:
+    def recursive_parse_packet(self, packet: Union[bytes, BasePacket, Packet]):
+        if hasattr(packet, 'to_string'):
             Message.info(packet.to_string())
+        else:
+            Message.info('Type: {0}'.format(type(packet)))
 
-        ethernet_packet = EthernetPacket(packet).decode()
+        # Check for targets here
 
-        if self.verbose:
-            Message.info(ethernet_packet.to_string())
-
-        if ethernet_packet.get_type() == 8:
-            ip_packet = IPPacket(ethernet_packet).decode()
-
-            if self.verbose:
-                Message.info(ip_packet.to_string())
-
-            if ip_packet.get_protocol() == 6:
-                tcp_packet = TCPPacket(ip_packet).decode()
-
-                # We are currently only interested in a select number of ports, since we're only parsing HTTP and FTP.
-                if tcp_packet.get_destination_port() == 80 and tcp_packet.get_source_port() == 80:
-                    Message.info(tcp_packet.to_string())
-
-                    self.identifier.identify_by_port(tcp_packet)
+        if isinstance(packet, bytes):
+            return self.recursive_parse_packet(Packet(packet))
+        elif isinstance(packet, Packet):
+            return self.recursive_parse_packet(EthernetPacket(packet).decode())
+        elif isinstance(packet, EthernetPacket):
+            # We are only interested in IP packets.
+            if packet.get_type() == 8:
+                return self.recursive_parse_packet(IPPacket(packet).decode())
+        elif isinstance(packet, IPPacket):
+            # We are only interested in TCP packets.
+            if packet.get_protocol() == 6:
+                return self.recursive_parse_packet(TCPPacket(packet).decode())
