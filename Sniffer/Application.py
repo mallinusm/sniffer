@@ -84,14 +84,14 @@ class Application:
         if self.device is None:
             self.set_device()
 
-        Capturer(self.verbose).capture(self.device)
+        Capturer(self.targets, self.verbose).capture(self.device)
 
     def show_welcome(self) -> None:
-        delimiter = '{0}'.format('#' * 30)
+        delimiter = '+{0}+'.format('-' * 28)
 
         Message.info(delimiter)
 
-        Message.info('#{0}#'.format('S N I F F E R'.center(28, ' ')))
+        Message.info('|{0}|'.format('CYBER SURVEILLANCE'.center(28, ' ')))
 
         Message.info(delimiter)
 

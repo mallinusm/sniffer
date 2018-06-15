@@ -1,4 +1,4 @@
-from Sniffer.Packets import IPPacket
+from Sniffer.Packets.IPPacket import IPPacket
 from Sniffer.Targets.Target import Target
 
 
@@ -9,4 +9,4 @@ class IPAddressTarget(Target):
     def check(self, packet: IPPacket) -> bool:
         ip_address = self.get_value()
 
-        return packet.get_source_address() is ip_address or packet.get_destination_address() is ip_address
+        return packet.get_source_address() == ip_address or packet.get_destination_address() == ip_address

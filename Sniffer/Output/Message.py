@@ -5,4 +5,4 @@ class Message:
 
     @staticmethod
     def input(message: str=None) -> str:
-        return input('<Sniffer>$ {0}'.format('' if message is None else message))
+        return input('$ {0}'.format('' if message is None else message))
