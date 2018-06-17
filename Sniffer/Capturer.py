@@ -2,6 +2,7 @@ import inspect
 import pcapy
 from typing import Union
 
+from Sniffer.Exceptions.InvalidPayloadException import InvalidPayloadException
 from Sniffer.Exceptions.NonIdentifiedProtocolException import NonIdentifiedProtocolException
 from Sniffer.Helpers import Helpers
 from Sniffer.Identifier import Identifier
@@ -16,6 +17,7 @@ from Sniffer.Selectors.Selector import Selector
 
 class Capturer:
     verbose = None
+    packets = None
     selectors = None
     identifier = None
 
@@ -23,6 +25,7 @@ class Capturer:
         self.identifier = Identifier()
         self.selectors = selectors
         self.verbose = verbose
+        self.packets = []
 
     def capture(self, device: str) -> None:
         Message.info('Capturing packets on device: {0}'.format(device))
@@ -39,20 +42,31 @@ class Capturer:
                     Message.info('Class: {0}, Time: {1}'.format(header.__class__.__name__, Helpers.get_timestamp()))
 
                 self.recursive_parse_packet(packet)
-
-                # Remove.
-                # break
         except (KeyboardInterrupt, SystemExit):
-            pass
+            if self.packets is not None and len(self.packets) > 0:
+                self.export_packets()
+
+    def export_packets(self):
+        Message.info('Found {0} packets using defined selectors.'.format(len(self.packets)))
+
+        if Message.input('<Export packets to filesystem (/tmp/sniffer/)? (Y/n)> ').lower() == 'y':
+            Message.info('Exporting packets to filesystem.')
+
+            for packet in self.packets:
+                if hasattr(packet, 'export') and callable(getattr(packet, 'export')):
+                    packet.export()
 
     @staticmethod
     def is_selector(selector: Selector, packet: BasePacket) -> bool:
+        # If the parameter of the check function expects a packet instance of the same type as the given packet, then
+        # we know that the selector should be executed against the given packet.
         return packet.__class__ is inspect.signature(selector.check).parameters['packet'].annotation
 
     def run_selectors(self, packet) -> None:
         for selector in self.selectors:
             if Capturer.is_selector(selector, packet) and selector.check(packet):
-                # Save/Export?
+                self.packets.append(packet)
+
                 Message.info('[{0}] Found packet({1}) for selector({2}) with value {3}'.format(
                     Helpers.get_timestamp(), packet.__class__.__name__, selector.get_name(), selector.get_value()
                 ))
@@ -66,6 +80,7 @@ class Capturer:
 
         self.run_selectors(packet)
 
+        # Unfortunately Python does not have a switch case statement. We can refactor the code using a map.
         if isinstance(packet, bytes):
             return self.recursive_parse_packet(Packet(packet))
         elif isinstance(packet, Packet):
@@ -80,8 +95,6 @@ class Capturer:
                 return self.recursive_parse_packet(TCPPacket(packet).decode())
         elif isinstance(packet, TCPPacket):
             try:
-                packet = self.identifier.decode(packet)
-
-                # More...
-            except NonIdentifiedProtocolException:
+                return self.recursive_parse_packet(self.identifier.decode(packet))
+            except (NonIdentifiedProtocolException, InvalidPayloadException):
                 pass

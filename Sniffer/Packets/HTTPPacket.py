@@ -1,3 +1,5 @@
+from Sniffer.Exceptions.InvalidPayloadException import InvalidPayloadException
+from Sniffer.Helpers import Helpers
 from Sniffer.Packets.BasePacket import BasePacket
 from Sniffer.Packets.TCPPacket import TCPPacket
 
@@ -7,12 +9,13 @@ class HTTPPacket(BasePacket):
         BasePacket.__init__(self, {}, packet, 0)
 
     def decode(self) -> 'HTTPPacket':
-        payload = str(self.packet.get_payload(), 'utf-8')
+        # Parse HTTP data using a lib (headers, status code, ...).
+        http_payload = str(self.packet.get_payload(), 'utf-8')
 
-        if '\x00' not in payload and len(payload) > 0:
-            print(payload)
-            print(len(payload))
-
-        # Parse using a HTTP lib
+        if '\x00' in http_payload or len(http_payload) < 1:
+            raise InvalidPayloadException('Invalid HTTP payload.')
 
         return self
+
+    def export(self) -> None:
+        Helpers.write_all_lines(str(self.packet.get_payload(), 'utf-8'))

@@ -1,5 +1,6 @@
 from Sniffer.Output.Message import Message
 from Sniffer.Selectors import Selector
+from Sniffer.Selectors.HTTPHostSelector import HTTPHostSelector
 from Sniffer.Selectors.IPAddressSelector import IPAddressSelector
 
 
@@ -9,7 +10,8 @@ class Selectors:
     def __init__(self) -> None:
         # We should be doing this dynamically. Scan all selectors within the Sniffer.Selectors module.
         self.selectors = [
-            IPAddressSelector
+            IPAddressSelector,
+            HTTPHostSelector
         ]
 
     def choose(self) -> Selector:
