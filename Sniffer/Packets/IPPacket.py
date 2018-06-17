@@ -8,7 +8,7 @@ from Sniffer.Packets.BasePacket import BasePacket
 class IPPacket(BasePacket):
     header_length = 20
 
-    def __init__(self, packet: EthernetPacket):
+    def __init__(self, packet: EthernetPacket) -> None:
         BasePacket.__init__(self, {
             'ihl': None,
             'ttl': None,
@@ -81,7 +81,7 @@ class IPPacket(BasePacket):
         is 15 words (15 * 32 bits, or 480 bits = 60 bytes).
         By default, we expect the header length to be 20 bytes. If that is not the case, we set the calculated offset.
         """
-        calculated_offset = self.get_ihl() * 4
+        calculated_offset = int(self.get_ihl() * 4)
         if calculated_offset is not self.header_length:
             self.offset = calculated_offset
 

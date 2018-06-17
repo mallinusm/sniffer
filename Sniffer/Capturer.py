@@ -1,8 +1,9 @@
-import datetime
 import inspect
 import pcapy
 from typing import Union
 
+from Sniffer.Exceptions.NonIdentifiedProtocolException import NonIdentifiedProtocolException
+from Sniffer.Helpers import Helpers
 from Sniffer.Identifier import Identifier
 from Sniffer.Output.Message import Message
 from Sniffer.Packets.BasePacket import BasePacket
@@ -10,17 +11,17 @@ from Sniffer.Packets.EthernetPacket import EthernetPacket
 from Sniffer.Packets.IPPacket import IPPacket
 from Sniffer.Packets.Packet import Packet
 from Sniffer.Packets.TCPPacket import TCPPacket
-from Sniffer.Targets.Target import Target
+from Sniffer.Selectors.Selector import Selector
 
 
 class Capturer:
-    targets = None
-    identifier = None
     verbose = None
+    selectors = None
+    identifier = None
 
-    def __init__(self, targets: list, verbose: bool = False):
+    def __init__(self, selectors: list, verbose: bool = False):
         self.identifier = Identifier()
-        self.targets = targets
+        self.selectors = selectors
         self.verbose = verbose
 
     def capture(self, device: str) -> None:
@@ -29,35 +30,31 @@ class Capturer:
         try:
             capture = pcapy.open_live(device, 65536, 1, 0)
 
-            capture.setfilter('tcp')
+            capture.setfilter('tcp')  # We are only interested in TCP packets for this PoC.
 
             while True:
                 (header, packet) = capture.next()
 
                 if self.verbose:
-                    Message.info('Class: {0}, Time: {1}'.format(header.__class__.__name__, Capturer.get_timestamp()))
+                    Message.info('Class: {0}, Time: {1}'.format(header.__class__.__name__, Helpers.get_timestamp()))
 
                 self.recursive_parse_packet(packet)
 
                 # Remove.
-                break
+                # break
         except (KeyboardInterrupt, SystemExit):
             pass
 
     @staticmethod
-    def get_timestamp() -> str:
-        return datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+    def is_selector(selector: Selector, packet: BasePacket) -> bool:
+        return packet.__class__ is inspect.signature(selector.check).parameters['packet'].annotation
 
-    @staticmethod
-    def is_target(target: Target, packet: BasePacket) -> bool:
-        return packet.__class__ is inspect.signature(target.check).parameters['packet'].annotation
-
-    def handle_targets(self, packet):
-        for target in self.targets:
-            if Capturer.is_target(target, packet) and target.check(packet):
+    def run_selectors(self, packet) -> None:
+        for selector in self.selectors:
+            if Capturer.is_selector(selector, packet) and selector.check(packet):
                 # Save/Export?
-                Message.info('[{0}] Found packet({1}) for target({2}) with value {3}'.format(
-                    Capturer.get_timestamp(), packet.__class__.__name__, target.get_name(), target.get_value()
+                Message.info('[{0}] Found packet({1}) for selector({2}) with value {3}'.format(
+                    Helpers.get_timestamp(), packet.__class__.__name__, selector.get_name(), selector.get_value()
                 ))
 
     def recursive_parse_packet(self, packet: Union[bytes, BasePacket, Packet]):  # Add correct return Tuple.
@@ -67,7 +64,7 @@ class Capturer:
             else:
                 Message.info('Type: {0}'.format(type(packet)))
 
-        self.handle_targets(packet)
+        self.run_selectors(packet)
 
         if isinstance(packet, bytes):
             return self.recursive_parse_packet(Packet(packet))
@@ -81,3 +78,10 @@ class Capturer:
             # We are only interested in TCP packets.
             if packet.get_protocol() == 6:
                 return self.recursive_parse_packet(TCPPacket(packet).decode())
+        elif isinstance(packet, TCPPacket):
+            try:
+                packet = self.identifier.decode(packet)
+
+                # More...
+            except NonIdentifiedProtocolException:
+                pass

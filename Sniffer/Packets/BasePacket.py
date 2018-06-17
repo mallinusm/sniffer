@@ -8,7 +8,7 @@ class BasePacket:
     offset = None
     packet = None
 
-    def __init__(self, bag: dict, packet: 'BasePacket', offset: int = 0):
+    def __init__(self, bag: dict, packet: 'BasePacket', offset: int = 0) -> None:
         self.bag = Bag(bag)
         self.packet = packet
         self.offset = offset
@@ -20,7 +20,10 @@ class BasePacket:
         return self.bag
 
     def get_payload(self) -> bytes:
-        return self.packet.get_payload()[self.offset:]
+        if isinstance(self.offset, int):
+            return self.packet.get_payload()[self.offset:]
+        else:
+            return self.packet.get_payload()
 
     def to_string(self) -> str:
         # Dirty... There seems to be no other way around.

@@ -1,7 +1,7 @@
 class Packet:
     payload = None
 
-    def __init__(self, payload: bytes):
+    def __init__(self, payload: bytes) -> None:
         self.payload = payload
 
     def get_payload(self) -> bytes:

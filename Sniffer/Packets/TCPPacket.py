@@ -7,7 +7,7 @@ from Sniffer.Packets.BasePacket import BasePacket
 class TCPPacket(BasePacket):
     header_length = 20
 
-    def __init__(self, packet: IPPacket):
+    def __init__(self, packet: IPPacket) -> None:
         BasePacket.__init__(self, {
             'flags': None,
             'window': None,
@@ -61,7 +61,7 @@ class TCPPacket(BasePacket):
         self.bag.set_attribute('urgent_pointer', tcp_header[8])
 
         # The data offset field stores the total size of a TCP header in multiples of four bytes.
-        calculated_offset = self.offset / 4
+        calculated_offset = int(self.get_offset() / 4)
         if calculated_offset is not self.header_length:
             self.offset = calculated_offset
 

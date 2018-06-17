@@ -1,0 +1,2 @@
+class NonIdentifiedProtocolException(Exception):
+    pass

@@ -8,7 +8,7 @@ from Sniffer.Packets.BasePacket import BasePacket
 class EthernetPacket(BasePacket):
     header_length = 14
 
-    def __init__(self, packet: Packet):
+    def __init__(self, packet: Packet) -> None:
         BasePacket.__init__(self, {
             'type': None,
             'source_address': None,

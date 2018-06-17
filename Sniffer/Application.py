@@ -3,62 +3,61 @@ import os
 from Sniffer.Capturer import Capturer
 from Sniffer.Devices import Devices
 from Sniffer.Output.Message import Message
-from Sniffer.Targets.Targets import Targets
+from Sniffer.Selectors.Selectors import Selectors
 
 
 class Application:
     device = None
-    targets = None
     aliases = None
     running = None
     verbose = None
     commands = None
+    selectors = None
 
     def __init__(self) -> None:
         self.running = True
         self.verbose = False
-        self.targets = []
+        self.selectors = []
         self.commands = {
             'quit': self.quit,
             'exit': self.quit,
             'start': self.start,
             'clear': self.clear,
             'devices': self.devices,
-            'target': self.set_target,
             'device': self.set_device,
-            'targets': self.list_targets,
-            'verbose': self.toggle_verbose
+            'selector': self.set_selector,
+            'verbose': self.toggle_verbose,
+            'selectors': self.list_selectors
         }
         self.aliases = {
             'c': 'clear',
             's': 'start',
-            't': 'target',
             'd': 'devices',
             'v': 'verbose'
         }
 
-    def set_target(self) -> None:
-        target = Targets().choose()
+    def set_selector(self) -> None:
+        selector = Selectors().choose()
 
-        Message.info('Selected {0}'.format(target.__name__))
+        Message.info('Selected {0}'.format(selector.__name__))
 
         # Not all targets may need a value. For the moment it is the case, so let's assume we need the input.
         value = None
         while value is None or value is "":
-            value = Message.input('<Choose {0}>: '.format(target().get_name()))
+            value = Message.input('<Choose {0}>: '.format(selector().get_name()))
 
-        target = target(value)
+        selector = selector(value)
 
-        self.targets.append(target)
+        self.selectors.append(selector)
 
-        Message.info('Target {0} ({1}) was added.'.format(target.get_name(), target.get_value()))
+        Message.info('Selector {0} ({1}) was added.'.format(selector.get_name(), selector.get_value()))
 
-    def list_targets(self) -> None:
-        if len(self.targets) < 1:
-            Message.info('No targets specified.')
+    def list_selectors(self) -> None:
+        if len(self.selectors) < 1:
+            Message.info('No selectors specified.')
         else:
-            for target in self.targets:
-                Message.info('{0} with value {1}'.format(target.get_name(), target.get_value()))
+            for selector in self.selectors:
+                Message.info('{0} with value {1}'.format(selector.get_name(), selector.get_value()))
 
     def quit(self) -> None:
         self.running = False
@@ -78,25 +77,26 @@ class Application:
         Message.info('Verbose is now {0}'.format('on' if self.verbose else 'off'))
 
     def start(self) -> None:
-        if len(self.targets) < 1:
-            self.set_target()
+        if len(self.selectors) < 1:
+            self.set_selector()
 
         if self.device is None:
             self.set_device()
 
-        Capturer(self.targets, self.verbose).capture(self.device)
+        Capturer(self.selectors, self.verbose).capture(self.device)
 
-    def show_welcome(self) -> None:
+    @staticmethod
+    def show_welcome() -> None:
         delimiter = '+{0}+'.format('-' * 28)
 
         Message.info(delimiter)
 
-        Message.info('|{0}|'.format('CYBER SURVEILLANCE'.center(28, ' ')))
+        Message.info('|{0}|'.format('sniffer'.upper().center(28, ' ')))
 
         Message.info(delimiter)
 
     def main(self) -> None:
-        self.show_welcome()
+        Application.show_welcome()
 
         try:
             while self.running:

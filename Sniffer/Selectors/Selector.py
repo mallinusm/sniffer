@@ -1,19 +1,19 @@
 import abc
 
-from Sniffer.Packets import Packet
+from Sniffer.Packets.BasePacket import BasePacket
 
 
-class Target(metaclass=abc.ABCMeta):
+class Selector(metaclass=abc.ABCMeta):
     value = None
 
-    def __init__(self, value: str = None):
+    def __init__(self, value: str = None) -> None:
         self.value = value
 
     def get_value(self) -> str:
         return self.value
 
     @abc.abstractmethod
-    def check(self, packet: Packet) -> bool:
+    def check(self, packet: BasePacket) -> bool:
         pass
 
     @abc.abstractmethod

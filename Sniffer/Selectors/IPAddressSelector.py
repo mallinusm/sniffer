@@ -1,8 +1,8 @@
 from Sniffer.Packets.IPPacket import IPPacket
-from Sniffer.Targets.Target import Target
+from Sniffer.Selectors.Selector import Selector
 
 
-class IPAddressTarget(Target):
+class IPAddressSelector(Selector):
     def get_name(self) -> str:
         return 'IP Address'
 
