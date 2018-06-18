@@ -1,6 +1,7 @@
 import inspect
 
 from Sniffer.Bag import Bag
+from Sniffer.Helpers import Helpers
 
 
 class BasePacket:
@@ -24,6 +25,9 @@ class BasePacket:
             return self.packet.get_payload()[self.offset:]
         else:
             return self.packet.get_payload()
+
+    def export(self) -> None:
+        Helpers.write_all_lines(Helpers.bytes_to_utf8(self.packet.get_payload()))
 
     def to_string(self) -> str:
         # Dirty... There seems to be no other way around.

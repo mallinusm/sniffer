@@ -10,12 +10,10 @@ class HTTPPacket(BasePacket):
 
     def decode(self) -> 'HTTPPacket':
         # Parse HTTP data using a lib (headers, status code, ...).
-        http_payload = str(self.packet.get_payload(), 'utf-8')
+        http_payload = Helpers.bytes_to_utf8(self.packet.get_payload())
 
+        # Basic heuristic techniques, might not be accurate.
         if '\x00' in http_payload or len(http_payload) < 1:
             raise InvalidPayloadException('Invalid HTTP payload.')
 
         return self
-
-    def export(self) -> None:
-        Helpers.write_all_lines(str(self.packet.get_payload(), 'utf-8'))

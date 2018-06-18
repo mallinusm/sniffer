@@ -1,7 +1,9 @@
 from Sniffer.Output.Message import Message
 from Sniffer.Selectors import Selector
+from Sniffer.Selectors.FTPServerSelector import FTPServerSelector
 from Sniffer.Selectors.HTTPHostSelector import HTTPHostSelector
 from Sniffer.Selectors.IPAddressSelector import IPAddressSelector
+from Sniffer.Selectors.TwitterUsernameSelector import TwitterUsernameSelector
 
 
 class Selectors:
@@ -11,7 +13,9 @@ class Selectors:
         # We should be doing this dynamically. Scan all selectors within the Sniffer.Selectors module.
         self.selectors = [
             IPAddressSelector,
-            HTTPHostSelector
+            HTTPHostSelector,
+            TwitterUsernameSelector,
+            FTPServerSelector
         ]
 
     def choose(self) -> Selector:

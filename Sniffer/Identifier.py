@@ -1,5 +1,6 @@
 from Sniffer.Exceptions.NonIdentifiedProtocolException import NonIdentifiedProtocolException
 from Sniffer.Packets.BasePacket import BasePacket
+from Sniffer.Packets.FTPPacket import FTPPacket
 from Sniffer.Packets.HTTPPacket import HTTPPacket
 from Sniffer.Packets.TCPPacket import TCPPacket
 
@@ -10,6 +11,7 @@ class Identifier:
     def __init__(self):
         # Add FTP
         self.protocols = {
+            21: FTPPacket,
             8000: HTTPPacket  # Obviously more possible ports for HTTP. 8000 is often used for local development.
         }
 

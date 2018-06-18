@@ -1,7 +1,7 @@
 import datetime
 import uuid
-
 import os
+import time
 
 from Sniffer.Output.Message import Message
 
@@ -12,8 +12,14 @@ class Helpers:
         return datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
 
     @staticmethod
+    def bytes_to_utf8(payload: bytes) -> str:
+        return str(payload, 'utf-8')
+
+    @staticmethod
     def generate_unique_tmp_filename():
-        return '/tmp/sniffer/{0}'.format(uuid.uuid4())
+        # Make sure the float value of the unix timestamp contains 10 decimal places and 7 digits.
+        # Obviously not very unique, but it's enough for this PoC.
+        return '/tmp/sniffer/{:10.7f}'.format(time.time())
 
     @staticmethod
     def write_all_lines(data) -> None:

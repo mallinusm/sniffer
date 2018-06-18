@@ -27,7 +27,8 @@ class Application:
             'device': self.set_device,
             'selector': self.set_selector,
             'verbose': self.toggle_verbose,
-            'selectors': self.list_selectors
+            'selectors': self.list_selectors,
+            'reset selectors': self.reset_selectors
         }
         self.aliases = {
             'c': 'clear',
@@ -35,6 +36,14 @@ class Application:
             'd': 'devices',
             'v': 'verbose'
         }
+
+    def reset_selectors(self) -> None:
+        if self.selectors is None or len(self.selectors) < 1:
+            Message.info('Selectors already empty.')
+        else:
+            self.selectors = []
+
+            Message.info('Selectors reset.')
 
     def set_selector(self) -> None:
         selector = Selectors().choose()
