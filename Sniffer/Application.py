@@ -19,8 +19,8 @@ class Application:
         self.verbose = False
         self.selectors = []
         self.commands = {
-            'quit': self.quit,
             'exit': self.quit,
+            'help': self.help,
             'start': self.start,
             'clear': self.clear,
             'devices': self.devices,
@@ -31,11 +31,19 @@ class Application:
             'reset selectors': self.reset_selectors
         }
         self.aliases = {
+            'q': 'exit',
+            'h': 'help',
             'c': 'clear',
             's': 'start',
             'd': 'devices',
             'v': 'verbose'
         }
+
+    def help(self) -> None:
+        for key in self.commands.keys():
+            alias = [alias for alias, value in self.aliases.items() if value == key]
+
+            Message.info('{0} ({1})'.format(key, alias[0] if len(alias) > 0 else "No alias"))
 
     def reset_selectors(self) -> None:
         if self.selectors is None or len(self.selectors) < 1:
