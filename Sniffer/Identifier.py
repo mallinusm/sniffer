@@ -11,7 +11,7 @@ class Identifier:
     def __init__(self):
         # Add FTP
         self.protocols = {
-            21: FTPPacket,
+            21: FTPPacket, # Command transfers.
             8000: HTTPPacket  # Obviously more possible ports for HTTP. 8000 is often used for local development.
         }
 
